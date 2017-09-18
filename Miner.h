@@ -19,7 +19,8 @@
 #include "MinerOwnedStates.h"
 #include "fsm/StateMachine.h"
 
-template <class entity_type> class State;
+template <class entity_type> class State; //pre-fixed with "template <class entity_type> " for vs8 compatibility
+
 struct Telegram;
 
 //the amount of gold a miner must have before he feels he can go home
