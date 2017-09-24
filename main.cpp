@@ -29,6 +29,7 @@ int main()
   //create his wife
   MinersWife* Elsa = new MinersWife(ent_Elsa);
 
+
   Drunk* Carlos = new Drunk(ent_Carlos);
 
   //register them with the entity manager
