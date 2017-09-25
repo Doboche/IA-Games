@@ -42,14 +42,14 @@
     <ClCompile Include="MinersWifeOwnedStates.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\Time\CrudeTimer.cpp">
-      <Filter>misc</Filter>
-    </ClCompile>
     <ClCompile Include="DrunkOwnedStates.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Drunk.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Time\CrudeTimer.cpp">
+      <Filter>misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

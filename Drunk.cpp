@@ -15,7 +15,7 @@ void Drunk::Update()
 
 bool Drunk::Attack()const
 {
-	if (m_iAttack >= AttackLevel) { return true; }
+	if (m_iFatigue >= TirednessThresholdD) { return true; }
 
 	return false;
 }

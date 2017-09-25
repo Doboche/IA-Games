@@ -31,7 +31,7 @@ const int MaxNuggets         = 3;
 const int ThirstLevel        = 5;
 //above this value a miner is sleepy
 const int TirednessThreshold = 5;
-
+//
 
 
 class Miner : public BaseGameEntity
@@ -95,6 +95,7 @@ public:
   bool          PocketsFull()const{return m_iGoldCarried >= MaxNuggets;}
 
   bool          Fatigued()const;
+  int			LevelFatigue()const{ return m_iFatigue; }
   void          DecreaseFatigue(){m_iFatigue -= 1;}
   void          IncreaseFatigue(){m_iFatigue += 1;}
 

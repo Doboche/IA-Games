@@ -238,21 +238,39 @@ void QuenchThirst::Execute(Miner* pMiner)
   pMiner->BuyAndDrinkAWhiskey();
 
   cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "That's mighty fine sippin' liquer";
-
+  cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "Leaving the saloon, feelin' good";
   pMiner->GetFSM()->ChangeState(EnterMineAndDigForNugget::Instance());  
 }
 
 
 void QuenchThirst::Exit(Miner* pMiner)
 { 
-  cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "Leaving the saloon, feelin' good";
 }
 
 
 bool QuenchThirst::OnMessage(Miner* pMiner, const Telegram& msg)
 {
-  //send msg to global message handler
-  return false;
+	SetTextColor(BACKGROUND_RED | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+
+	switch (msg.Msg)
+	{
+	case Msg_YouAreDumb:
+
+		cout << "\nMessage handled by " << GetNameOfEntity(pMiner->ID())
+			<< " at time: " << Clock->GetCurrentTime();
+
+		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+
+		cout << "\n" << GetNameOfEntity(pMiner->ID())
+			<< ": OK je vais te casser la tête";
+
+		pMiner->GetFSM()->ChangeState(Defend::Instance());
+
+		return true;
+
+	}//end switch
+
+	return false; //send message to global message handler
 }
 
 //------------------------------------------------------------------------EatStew
@@ -289,4 +307,41 @@ bool EatStew::OnMessage(Miner* pMiner, const Telegram& msg)
   return false;
 }
 
+//------------------------------------------------------------------------Defend
+
+Defend* Defend::Instance()
+{
+	static Defend instance;
+
+	return &instance;
+}
+
+
+void Defend::Enter(Miner* pMiner)
+{
+	cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "Let's go to the fight";
+}
+
+void Defend::Execute(Miner* pMiner)
+{
+	if (true) {
+		cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "I win";
+	}
+	else {
+		cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "I loose";
+	}
+	cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "I go to home for me reposer";
+	pMiner->GetFSM()->ChangeState(GoHomeAndSleepTilRested::Instance());
+}
+
+void Defend::Exit(Miner* pMiner)
+{
+}
+
+
+bool Defend::OnMessage(Miner* pMiner, const Telegram& msg)
+{
+	//send msg to global message handler
+	return false;
+}
 

@@ -172,7 +172,34 @@ public:
   virtual bool OnMessage(Miner* agent, const Telegram& msg);
 };
 
+//------------------------------------------------------------------------
+//
+//  this is implemented as a state blip. The miner eats the stew, gives
+//  Elsa some compliments and then returns to his previous state
+//------------------------------------------------------------------------
+class Defend : public State<Miner>
+{
+private:
+  
+	Defend(){}
 
+  //copy ctor and assignment should be private
+  Defend(const Defend&);
+  Defend& operator=(const Defend&);
+ 
+public:
+
+  //this is a singleton
+  static Defend* Instance();
+
+  virtual void Enter(Miner* miner);
+
+  virtual void Execute(Miner* miner);
+
+  virtual void Exit(Miner* miner);
+
+  virtual bool OnMessage(Miner* agent, const Telegram& msg);
+};
 
 
 #endif
