@@ -40,18 +40,7 @@ void QuenchThirstD::Execute(Drunk* pDrunk)
 	pDrunk->IncreaseFatigue();
 	cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "Ahh nice whiskey !";
 
-	if (pDrunk->Attack())
-	{
-		cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "You are dumb !";
-		//send a delayed message myself so that I know when to take the stew
-		//out of the oven
-		Dispatch->DispatchMessage(SEND_MSG_IMMEDIATELY,                  //time delay
-			pDrunk->ID(),           //sender ID
-			ent_Miner_Bob,           //receiver ID
-			Msg_YouAreDumb,        //msg
-			NO_ADDITIONAL_INFO);
-		pDrunk->GetFSM()->ChangeState(Attack::Instance());
-	}
+	
 
 	if (pDrunk->Puke())
 	{
@@ -68,7 +57,29 @@ void QuenchThirstD::Exit(Drunk* pDrunk)
 
 bool QuenchThirstD::OnMessage(Drunk* pDrunk, const Telegram& msg)
 {
-	//send msg to global message handler
+	switch (msg.Msg)
+	{
+	case Msg_Hello:
+		if (pDrunk->Attack())
+		{
+			SetTextColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+			cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "You are dumb !";
+			//send a delayed message myself so that I know when to take the stew
+			//out of the oven
+			Dispatch->DispatchMessage(SEND_MSG_IMMEDIATELY,                  //time delay
+				pDrunk->ID(),           //sender ID
+				ent_Miner_Bob,           //receiver ID
+				Msg_YouAreDumb,        //msg
+				NO_ADDITIONAL_INFO);
+		}
+		return true;
+
+	case Msg_Fight:
+
+		pDrunk->GetFSM()->ChangeState(Attack::Instance());
+
+		return true;
+	}
 	return false;
 }
 //------------------------------------------------------methods for GoHomeAndSleepTilRested
@@ -83,7 +94,7 @@ void GoHomeAndSleepTilRestedD::Enter(Drunk* pDrunk)
 {
 	if (pDrunk->Location() != shack)
 	{
-		cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "I'm coming home !";
+		cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "It's nice to be at home !";
 
 		pDrunk->ChangeLocation(shack);
 	}
@@ -94,7 +105,7 @@ void GoHomeAndSleepTilRestedD::Execute(Drunk* pDrunk)
 	if (!pDrunk->Fatigue())
 	{
 		cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": "
-			<< "All mah fatigue has drained away. Time drink!";
+			<< "All mah fatigue has drained away. Time to drink!";
 
 		pDrunk->GetFSM()->ChangeState(QuenchThirstD::Instance());
 	}
@@ -130,19 +141,20 @@ Attack* Attack::Instance()
 
 void Attack::Enter(Drunk* pDrunk)
 {
+	SetTextColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 	cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "Let's go to the fight";
 }
 
 void Attack::Execute(Drunk* pDrunk)
 {
-	if (false) {
-		cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "I win";
-	}
-	else {
-		cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "I loose";
-	}
-	cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "I go to home for me reposer";
-	pDrunk->GetFSM()->ChangeState(GoHomeAndSleepTilRestedD::Instance());
+	
+	cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "Take that !";
+
+	Dispatch->DispatchMessage(SEND_MSG_IMMEDIATELY,                  //time delay
+		pDrunk->ID(),           //sender ID
+		ent_Miner_Bob,           //receiver ID
+		Msg_Kick,        //msg
+		(int*)pDrunk->LevelFatigue());
 }
 
 void Attack::Exit(Drunk* pDrunk)
@@ -152,6 +164,15 @@ void Attack::Exit(Drunk* pDrunk)
 
 bool Attack::OnMessage(Drunk* pDrunk, const Telegram& msg)
 {
-	//send msg to global message handler
+	SetTextColor(FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+	if ((int*)pDrunk->LevelFatigue()<msg.ExtraInfo) {
+		cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "I win";
+	}
+	else {
+		cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "I loose";
+	}
+	cout << "\n" << GetNameOfEntity(pDrunk->ID()) << ": " << "I go to home for rest";
+	pDrunk->GetFSM()->ChangeState(GoHomeAndSleepTilRestedD::Instance());
+
 	return false;
 }

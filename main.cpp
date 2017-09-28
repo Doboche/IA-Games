@@ -21,7 +21,7 @@ int main()
 #endif
 
   //seed random number generator
-  srand((unsigned) time(NULL));
+  srand((unsigned) time(NULL)); 
 
   //create a miner
   Miner* Bob = new Miner(ent_Miner_Bob);

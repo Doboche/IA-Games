@@ -151,6 +151,7 @@ void GoHomeAndSleepTilRested::Enter(Miner* pMiner)
 {
   if (pMiner->Location() != shack)
   {
+	 SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
     cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "Walkin' home";
 
     pMiner->ChangeLocation(shack); 
@@ -230,6 +231,15 @@ void QuenchThirst::Enter(Miner* pMiner)
     pMiner->ChangeLocation(saloon);
 
     cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "Boy, ah sure is thusty! Walking to the saloon";
+
+	cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "Hello everybody !";
+	//send a delayed message myself so that I know when to take the stew
+	//out of the oven
+	Dispatch->DispatchMessage(SEND_MSG_IMMEDIATELY,                  //time delay
+		pMiner->ID(),           //sender ID
+		ent_Carlos,           //receiver ID
+		Msg_Hello,        //msg
+		NO_ADDITIONAL_INFO);
   }
 }
 
@@ -262,18 +272,22 @@ bool QuenchThirst::OnMessage(Miner* pMiner, const Telegram& msg)
 		SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
 
 		cout << "\n" << GetNameOfEntity(pMiner->ID())
-			<< ": OK je vais te casser la tête";
+			<< ": WHAT ? You want fight ?";
+
+
+		Dispatch->DispatchMessage(SEND_MSG_IMMEDIATELY,                  //time delay
+			pMiner->ID(),           //sender ID
+			ent_Carlos,           //receiver ID
+			Msg_Fight,        //msg
+			NO_ADDITIONAL_INFO);
 
 		pMiner->GetFSM()->ChangeState(Defend::Instance());
-
 		return true;
 
 	}//end switch
 
 	return false; //send message to global message handler
 }
-
-//------------------------------------------------------------------------EatStew
 
 EatStew* EatStew::Instance()
 {
@@ -319,29 +333,38 @@ Defend* Defend::Instance()
 
 void Defend::Enter(Miner* pMiner)
 {
+	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
 	cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "Let's go to the fight";
 }
+//------------------------------------------------------------------------EatStew
+
 
 void Defend::Execute(Miner* pMiner)
-{
-	if (true) {
-		cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "I win";
-	}
-	else {
-		cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "I loose";
-	}
-	cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "I go to home for me reposer";
-	pMiner->GetFSM()->ChangeState(GoHomeAndSleepTilRested::Instance());
+{	
+
 }
 
 void Defend::Exit(Miner* pMiner)
 {
+	Dispatch->DispatchMessage(SEND_MSG_IMMEDIATELY,                  //time delay
+		pMiner->ID(),           //sender ID
+		ent_Carlos,           //receiver ID
+		Msg_Kick,        //msg
+		(int*)pMiner->LevelFatigue());
 }
 
 
 bool Defend::OnMessage(Miner* pMiner, const Telegram& msg)
 {
-	//send msg to global message handler
+	SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+	if ((int*)pMiner->LevelFatigue() <= msg.ExtraInfo) {
+		cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "I win";
+	}
+	else {
+		cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "I loose";
+	}
+	cout << "\n" << GetNameOfEntity(pMiner->ID()) << ": " << "I go to home for rest";
+	pMiner->GetFSM()->ChangeState(GoHomeAndSleepTilRested::Instance());
 	return false;
 }
 

@@ -16,7 +16,7 @@ template <class entity_type> class State;
 
 struct Telegram;
 
-const int TirednessThresholdD = 5;
+const int TirednessThresholdD = 4;
 const int PukeLevel = 8;
 
 class Drunk : public BaseGameEntity
